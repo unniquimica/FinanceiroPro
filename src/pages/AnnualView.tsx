@@ -56,8 +56,8 @@ export function AnnualView() {
     const isIncome = type === 'income';
     
     return (
-      <div className="rounded-lg border border-slate-200 shadow-sm bg-white mb-8 w-full overflow-hidden">
-        <table className="w-full text-xs text-left" style={{ tableLayout: 'fixed' }}>
+      <div className="rounded-lg border border-slate-200 shadow-sm bg-white mb-8 w-full overflow-x-auto scrollbar-hide">
+        <table className="w-full text-xs text-left min-w-[1000px]" style={{ tableLayout: 'fixed' }}>
           <thead className="bg-[#1E3A8A] text-white">
             <tr>
               <th className="py-2 pl-3 font-semibold uppercase whitespace-nowrap bg-[#1E3A8A] w-[20%]">
@@ -138,9 +138,12 @@ export function AnnualView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <h2 className="text-2xl font-bold tracking-tight">Controle Financeiro {selectedYear}</h2>
-        <p className="text-sm text-slate-500">Clique em qualquer célula para editar valor ou status.</p>
+        <div className="text-xs md:text-sm text-slate-500 flex flex-col items-start sm:items-end">
+          <p>Clique em qualquer célula para editar valor ou status.</p>
+          <p className="md:hidden font-medium text-blue-600">Arraste para os lados para ver todos os meses →</p>
+        </div>
       </div>
 
       {renderTable(incomes, 'income')}

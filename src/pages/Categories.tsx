@@ -70,18 +70,18 @@ export function Categories() {
   const renderCategoryGroup = (title: string, data: typeof categories) => (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold tracking-tight text-slate-800">{title}</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-3 sm:gap-4">
         {data.map(cat => (
           <Card key={cat.id} className="hover:border-slate-300 transition-colors cursor-pointer group">
-            <div className="p-4 flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${cat.color} shadow-sm group-hover:scale-105 transition-transform`}>
+            <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 text-center sm:text-left">
+              <div className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-white ${cat.color} shadow-sm group-hover:scale-105 transition-transform`}>
                 <IconView name={cat.iconName} className="w-5 h-5" />
               </div>
-              <div className="flex-1">
-                <p className="font-medium text-slate-900">{cat.name}</p>
-                <p className="text-xs text-slate-500 capitalize">{cat.type === 'income' ? 'Receita' : cat.type === 'expense' ? 'Despesa' : 'Híbrido'}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-slate-900 truncate w-full group-hover:whitespace-normal">{cat.name}</p>
+                <p className="text-[10px] sm:text-xs text-slate-500 capitalize">{cat.type === 'income' ? 'Receita' : cat.type === 'expense' ? 'Despesa' : 'Híbrido'}</p>
               </div>
-              <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); openEdit(cat); }}>
+              <Button variant="ghost" size="icon" className="md:opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8" onClick={(e) => { e.stopPropagation(); openEdit(cat); }}>
                 <Settings2 className="w-4 h-4 text-slate-400" />
               </Button>
             </div>

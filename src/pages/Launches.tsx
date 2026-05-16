@@ -211,8 +211,9 @@ export function Launches() {
       </div>
 
       <Card>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+        <div className="overflow-x-auto scrollbar-hide">
+          <p className="md:hidden text-[10px] text-blue-600 font-medium px-6 py-2 bg-slate-50 border-b border-slate-100">Arraste para o lado para ver mais informações →</p>
+          <table className="w-full text-sm text-left min-w-[800px]">
             <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
               <tr>
                 <th className="px-6 py-3 font-medium">Descrição</th>
