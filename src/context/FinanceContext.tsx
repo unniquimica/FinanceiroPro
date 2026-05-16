@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Category, Launch, Parcel } from '../types';
 import { defaultCategories } from '../data/mockData';
 import { useAuth } from './AuthContext';
-import { safeFetch } from '../lib/api';
+import { supabase } from '../lib/supabase';
 
 interface FinanceContextType {
   categories: Category[];
@@ -33,50 +33,73 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth() + 1);
 
-  // Load from API
+  // Load from Supabase
   useEffect(() => {
     if (!user) {
       setCategories(defaultCategories);
       setLaunches([]);
       setParcels([]);
-      setIsLoaded(true); // Treat as loaded but empty when no user
+      setIsLoaded(true);
       return;
     }
     
     setIsLoaded(false);
-    const token = localStorage.getItem('token');
     
     const loadData = async () => {
-      const { data, error } = await safeFetch('/api/data', {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
+      try {
+        const { data, error } = await supabase
+          .from('user_finance')
+          .select('data')
+          .eq('user_id', user.id)
+          .single();
 
-      if (!error && data) {
-        if (data.categories) setCategories(data.categories);
-        setLaunches(data.launches || []);
-        setParcels(data.parcels || []);
-      } else {
-        // If error or no data, use defaults for new user
-        setCategories(defaultCategories);
-        setLaunches([]);
-        setParcels([]);
-        if (error) console.error('Erro ao carregar dados:', error);
+        if (error) {
+          if (error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+            console.warn('Erro ao carregar do Supabase (pode ser que a tabela não exista):', error.message);
+          }
+          // Default data for new user
+          setCategories(defaultCategories);
+          setLaunches([]);
+          setParcels([]);
+        } else if (data?.data) {
+          const remoteData = data.data;
+          if (remoteData.categories) setCategories(remoteData.categories);
+          setLaunches(remoteData.launches || []);
+          setParcels(remoteData.parcels || []);
+        }
+      } catch (err) {
+        console.error('Erro fatal ao carregar dados:', err);
+      } finally {
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
     };
 
     loadData();
   }, [user]);
 
-  // Save to API when data changes
+  // Save to Supabase when data changes
   useEffect(() => {
     if (isLoaded && user) {
-      const token = localStorage.getItem('token');
-      safeFetch('/api/data', {
-        method: 'POST',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-        body: JSON.stringify({ categories, launches, parcels })
-      }).catch(err => console.error('Erro ao salvar dados:', err));
+      const saveData = async () => {
+        try {
+          const { error } = await supabase
+            .from('user_finance')
+            .upsert({ 
+              user_id: user.id, 
+              data: { categories, launches, parcels },
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+
+          if (error) {
+            console.error('Erro ao salvar no Supabase:', error.message);
+          }
+        } catch (err) {
+          console.error('Erro fatal ao salvar dados:', err);
+        }
+      };
+
+      const timeoutId = setTimeout(saveData, 1000); // Debounce saves
+      return () => clearTimeout(timeoutId);
     }
   }, [categories, launches, parcels, isLoaded, user]);
 

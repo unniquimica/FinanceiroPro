@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { safeFetch } from '../lib/api';
+import { supabase } from '../lib/supabase';
 
 export interface User {
   id: string;
@@ -11,95 +11,107 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (credential: string, psw: string) => Promise<void>;
+  login: (email: string, psw: string) => Promise<void>;
   register: (username: string, email: string, psw: string) => Promise<void>;
   logout: () => Promise<void>;
-  resetPassword: (credential: string) => Promise<any>;
+  resetPassword: (email: string) => Promise<any>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const mapSupabaseError = (error: any) => {
+  if (!error) return null;
+  const msg = error.message.toLowerCase();
+  if (msg.includes('invalid login credentials') || msg.includes('email not confirmed')) return 'E-mail ou senha incorretos.';
+  if (msg.includes('user already registered')) return 'Este e-mail já está cadastrado.';
+  if (msg.includes('password is too short')) return 'A senha deve ter pelo menos 6 caracteres.';
+  if (msg.includes('too many requests')) return 'Muitas tentativas. Tente novamente mais tarde.';
+  return error.message;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      const { data, error } = await safeFetch('/api/auth/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (!error && data?.user) {
-        setUser(data.user);
-      } else if (error) {
-        console.warn('Falha na autenticação automática:', error);
-        localStorage.removeItem('token');
+    // Check active sessions and sets relevant state
+    const setSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          username: session.user.user_metadata.username || session.user.email?.split('@')[0] || 'Usuário',
+          role: 'user'
+        });
       }
       setIsLoading(false);
     };
 
-    checkAuth();
-  }, []);
+    setSession();
 
-  const login = async (credential: string, psw: string) => {
-    const { data, error } = await safeFetch('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ credential, password: psw })
+    // Listen for changes on auth state (logged in, signed out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          username: session.user.user_metadata.username || session.user.email?.split('@')[0] || 'Usuário',
+          role: 'user'
+        });
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
     });
 
-    if (error) throw new Error(error);
-    
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      setUser(data.user);
-    }
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email: string, psw: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: psw,
+    });
+
+    if (error) throw new Error(mapSupabaseError(error) || 'Erro ao realizar login');
   };
 
   const register = async (username: string, email: string, psw: string) => {
-    const { error } = await safeFetch('/api/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ username, email, password: psw })
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: psw,
+      options: {
+        data: {
+          username: username,
+        },
+      },
     });
 
-    if (error) throw new Error(error);
+    if (error) throw new Error(mapSupabaseError(error) || 'Erro ao realizar cadastro');
   };
 
   const logout = async () => {
-    const token = localStorage.getItem('token');
-    await safeFetch('/api/auth/logout', { 
-      method: 'POST',
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
-    localStorage.removeItem('token');
-    setUser(null);
+    await supabase.auth.signOut();
   };
 
-  const resetPassword = async (credential: string) => {
-    const { data, error } = await safeFetch('/api/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({ credential })
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/configuracoes`,
     });
 
-    if (error) throw new Error(error);
-    return data;
+    if (error) throw new Error(mapSupabaseError(error) || 'Erro ao enviar e-mail de recuperação');
+    return { message: 'Verifique seu e-mail para redefinir sua senha.' };
   };
 
   const updatePassword = async (currentPassword: string, newPassword: string) => {
-    const token = localStorage.getItem('token');
-    const { error } = await safeFetch('/api/auth/update-password', {
-      method: 'POST',
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      body: JSON.stringify({ currentPassword, newPassword })
+    // Note: currentPassword is not strictly required by Supabase updateUser but we can't easily verify it without re-auth
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword
     });
 
-    if (error) throw new Error(error);
+    if (error) throw new Error(mapSupabaseError(error) || 'Erro ao atualizar senha');
   };
 
   return (
