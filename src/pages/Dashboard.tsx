@@ -22,7 +22,7 @@ export function Dashboard() {
     if (!launch) return;
 
     const category = categories.find(c => c.id === launch.categoryId);
-    if (category && (category.name === 'Despesas Mãe' || category.name === 'Receitas Mãe')) return;
+    if (category && (category.name === 'Despesas Não Contábeis' || category.name === 'Receitas Não Contábeis')) return;
 
     if (launch.type === 'income') {
       totalIncome += p.amount;
@@ -42,7 +42,7 @@ export function Dashboard() {
     if (!launch || launch.type !== 'expense') return;
     
     const category = categories.find(c => c.id === launch.categoryId);
-    if (category && category.name === 'Despesas Mãe') return;
+    if (category && category.name === 'Despesas Não Contábeis') return;
 
     const isPast = p.year < selectedYear || (p.year === selectedYear && p.month < currentMonth);
     const isCurrentMonAndOverdue = p.status === 'overdue' && p.year === selectedYear && p.month === currentMonth;
@@ -63,7 +63,7 @@ export function Dashboard() {
       const launch = launches.find(l => l.id === p.launchId);
       if (launch) {
         const category = categories.find(c => c.id === launch.categoryId);
-        if (category && (category.name === 'Despesas Mãe' || category.name === 'Receitas Mãe')) return;
+        if (category && (category.name === 'Despesas Não Contábeis' || category.name === 'Receitas Não Contábeis')) return;
 
         if (launch.type === 'income') inc += p.amount;
         else exp += p.amount;

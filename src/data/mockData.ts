@@ -11,6 +11,8 @@ export const defaultCategories: Category[] = [
   { id: 'cat_saude', name: 'Saúde', color: 'bg-rose-500', iconName: 'HeartPulse', type: 'expense' },
   { id: 'cat_salario', name: 'Salários', color: 'bg-green-600', iconName: 'Banknote', type: 'expense' },
   { id: 'cat_salario_rec', name: 'Salário/Renda', color: 'bg-emerald-500', iconName: 'Wallet', type: 'income' },
+  { id: 'cat_desp_nao_contab', name: 'Despesas Não Contábeis', color: 'bg-slate-400', iconName: 'Ghost', type: 'expense' },
+  { id: 'cat_rec_nao_contab', name: 'Receitas Não Contábeis', color: 'bg-slate-400', iconName: 'Ghost', type: 'income' },
 ];
 
 function createLaunchAndParcels(

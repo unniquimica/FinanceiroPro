@@ -310,18 +310,10 @@ export function Launches() {
               
               setEditingParcel(null);
             }} className="p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="col-span-2">
+              <div className="flex flex-col gap-4">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Descrição</label>
                   <input required type="text" value={desc} onChange={e => setDesc(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
-                  <select value={type} onChange={e => setType(e.target.value as TransactionType)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
-                    <option value="expense">Despesa</option>
-                    <option value="income">Receita</option>
-                  </select>
                 </div>
                 
                 <div>
@@ -333,18 +325,28 @@ export function Launches() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                  <select value={editStatus} onChange={e => setEditStatus(e.target.value as ParcelStatus)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
-                    <option value="pending">Pendente</option>
-                    <option value="paid">Pago</option>
-                    <option value="received">Recebido</option>
-                    <option value="overdue">Vencido</option>
-                    <option value="cancelled">Cancelado</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
+                    <select value={type} onChange={e => setType(e.target.value as TransactionType)} className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white">
+                      <option value="expense">Despesa</option>
+                      <option value="income">Receita</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                    <select value={editStatus} onChange={e => setEditStatus(e.target.value as ParcelStatus)} className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white">
+                      <option value="pending">Pendente</option>
+                      <option value="paid">Pago</option>
+                      <option value="received">Recebido</option>
+                      <option value="overdue">Vencido</option>
+                      <option value="cancelled">Cancelado</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div className="col-span-1 md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Valor desta parcela (R$)</label>
                   <input required type="text" value={amount} onChange={e => {
                     let value = e.target.value.replace(/\D/g, "");
@@ -373,20 +375,12 @@ export function Launches() {
               <button onClick={() => setIsNew(false)} className="text-slate-400 hover:text-slate-600">✕</button>
             </div>
             <form onSubmit={saveLaunch} className="p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="col-span-2">
+              <div className="flex flex-col gap-4">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Descrição</label>
                   <input required type="text" value={desc} onChange={e => setDesc(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Ex: Conta de Luz" />
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
-                  <select value={type} onChange={e => setType(e.target.value as TransactionType)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
-                    <option value="expense">Despesa</option>
-                    <option value="income">Receita</option>
-                  </select>
-                </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
                   <select required value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
@@ -395,30 +389,42 @@ export function Launches() {
                     ))}
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Valor da Parcela (R$)</label>
-                  <input required type="text" value={amount} onChange={e => {
-                    let value = e.target.value.replace(/\D/g, "");
-                    if (!value) return setAmount("");
-                    value = (Number(value) / 100).toFixed(2);
-                    value = value.replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-                    setAmount(value);
-                  }} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
+                    <select value={type} onChange={e => setType(e.target.value as TransactionType)} className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white">
+                      <option value="expense">Despesa</option>
+                      <option value="income">Receita</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Valor da Parcela (R$)</label>
+                    <input required type="text" value={amount} onChange={e => {
+                      let value = e.target.value.replace(/\D/g, "");
+                      if (!value) return setAmount("");
+                      value = (Number(value) / 100).toFixed(2);
+                      value = value.replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+                      setAmount(value);
+                    }} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Quantidade de Parcelas/Meses</label>
-                  <input required type="number" min="1" max="120" value={installments} onChange={e => setInstallments(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Parcelas</label>
+                    <input required type="number" min="1" max="120" value={installments} onChange={e => setInstallments(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
+                  </div>
 
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Mês Inicial ({selectedYear})</label>
-                  <select value={startMonth} onChange={e => setStartMonth(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md">
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>{getMonthName(i + 1)}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Mês Inicial</label>
+                    <select value={startMonth} onChange={e => setStartMonth(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white">
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>{getMonthName(i + 1)}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
