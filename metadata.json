@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Financeiro Pró",
+  "description": "Sistema moderno de controle financeiro pessoal e familiar com visão anual, dashboards e parcelamentos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
