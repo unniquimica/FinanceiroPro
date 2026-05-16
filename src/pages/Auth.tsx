@@ -80,10 +80,10 @@ export function AuthPage() {
             
             {(mode === 'login' || mode === 'forgot') && (
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-700">Usuário ou E-mail</label>
+                <label className="text-sm font-medium text-slate-700">E-mail</label>
                 <input
                   required
-                  type="text"
+                  type="email"
                   value={credential}
                   onChange={e => setCredential(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

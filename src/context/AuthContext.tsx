@@ -23,7 +23,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const mapSupabaseError = (error: any) => {
   if (!error) return null;
   const msg = error.message.toLowerCase();
-  if (msg.includes('invalid login credentials') || msg.includes('email not confirmed')) return 'E-mail ou senha incorretos.';
+  if (msg.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
+  if (msg.includes('email not confirmed')) return 'Confirme seu e-mail antes de fazer login.';
   if (msg.includes('user already registered')) return 'Este e-mail já está cadastrado.';
   if (msg.includes('password is too short')) return 'A senha deve ter pelo menos 6 caracteres.';
   if (msg.includes('too many requests')) return 'Muitas tentativas. Tente novamente mais tarde.';
@@ -83,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email,
       password: psw,
       options: {
+        emailRedirectTo: window.location.origin,
         data: {
           username: username,
         },
