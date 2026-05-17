@@ -76,7 +76,7 @@ export function Settings() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 md:hidden">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Configurações</h2>
           <p className="text-sm text-slate-500">Gerencie seus dados e preferências do sistema.</p>

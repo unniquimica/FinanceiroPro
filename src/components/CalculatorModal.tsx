@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calculator, Minimize2, Maximize2 } from 'lucide-react';
 import { Button } from './ui/Button';
 
@@ -25,9 +25,13 @@ export function CalculatorModal({ isOpen, onClose }: CalculatorModalProps) {
 
   const handleEqual = () => {
     try {
-      // safe eval alternative using Function
-      const result = new Function('return ' + equation + display)();
-      setDisplay(String(result));
+      const sanitizedEquation = (equation + display)
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/[^0-9\+\-\*\/\.\(\)% ]/g, '');
+      
+      const result = new Function('return ' + sanitizedEquation)();
+      setDisplay(String(Number.isFinite(result) ? result : 'Error'));
       setEquation('');
     } catch {
       setDisplay('Error');
@@ -59,26 +63,32 @@ export function CalculatorModal({ isOpen, onClose }: CalculatorModalProps) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
 
       const key = e.key;
 
       if (/[0-9]/.test(key)) {
+        e.preventDefault();
         handleNumber(key);
       } else if (['+', '-', '*', '/'].includes(key)) {
+        e.preventDefault();
         handleOperator(key);
       } else if (key === 'Enter' || key === '=') {
         e.preventDefault();
         handleEqual();
       } else if (key === 'Escape' || key === 'c' || key === 'C') {
+        e.preventDefault();
         handleClear();
       } else if (key === 'Backspace') {
+        e.preventDefault();
         setDisplay(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
       } else if (key === '.') {
+        e.preventDefault();
         if (!display.includes('.')) handleNumber('.');
       } else if (key === '%') {
+        e.preventDefault();
         handleOperator('%');
       }
     };

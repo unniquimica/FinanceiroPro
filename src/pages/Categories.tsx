@@ -78,7 +78,7 @@ export function Categories() {
                 <IconView name={cat.iconName} className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-slate-900 truncate w-full group-hover:whitespace-normal">{cat.name}</p>
+                <p className="font-medium text-slate-900 leading-tight break-words">{cat.name}</p>
                 <p className="text-[10px] sm:text-xs text-slate-500 capitalize">{cat.type === 'income' ? 'Receita' : cat.type === 'expense' ? 'Despesa' : 'Híbrido'}</p>
               </div>
               <Button variant="ghost" size="icon" className="md:opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8" onClick={(e) => { e.stopPropagation(); openEdit(cat); }}>
@@ -94,10 +94,11 @@ export function Categories() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+        <div className="md:hidden">
           <h2 className="text-2xl font-bold tracking-tight">Categorias</h2>
           <p className="text-sm text-slate-500">Organize suas finanças por grupos familiares.</p>
         </div>
+        <div className="hidden md:block" /> { /* Spacer for desktop */ }
         <Button className="gap-2" onClick={openNew}>
           <Plus className="w-4 h-4" />
           Nova Categoria

@@ -22,6 +22,18 @@ export function Layout() {
   const location = useLocation();
   const hideYearSelector = location.pathname === '/categorias' || location.pathname === '/configuracoes';
   const isDashboard = location.pathname === '/';
+  
+  const getHeaderTitle = () => {
+    switch (location.pathname) {
+      case '/': return 'Dashboard';
+      case '/anual': return 'Visão Anual';
+      case '/lancamentos': return 'Lançamentos';
+      case '/categorias': return 'Categorias';
+      case '/configuracoes': return 'Configurações';
+      default: return 'Controle Financeiro';
+    }
+  };
+
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -99,62 +111,50 @@ export function Layout() {
 
       <div className="md:pl-64 flex flex-col min-h-screen">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10 hidden md:flex">
-          {isDashboard ? (
-            <>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">
-                Visão Geral
-              </h1>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                  <button 
-                    onClick={() => setCurrentMonth(p => Math.max(1, p - 1))}
-                    disabled={currentMonth === 1}
-                    className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-slate-600" />
-                  </button>
-                  <span className="font-semibold text-slate-800 min-w-[120px] text-center uppercase text-sm tracking-widest">
-                    {getMonthName(currentMonth)}
-                  </span>
-                  <button 
-                    onClick={() => setCurrentMonth(p => Math.min(12, p + 1))}
-                    disabled={currentMonth === 12}
-                    className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
-                  >
-                    <ChevronRight className="w-5 h-5 text-slate-600" />
-                  </button>
-                </div>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="bg-slate-100 border-none text-sm font-medium rounded-md px-3 py-1.5 cursor-pointer focus:ring-2 focus:ring-slate-900 outline-none h-8"
+          <div className="flex items-center gap-3">
+            <div className="font-bold text-lg text-slate-900 flex items-center gap-2 mr-4 border-r border-slate-200 pr-4">
+              <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Logo" className="h-8 object-contain" />
+              <span className="text-base uppercase tracking-wider">Financeiro Pró</span>
+            </div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">
+              {getHeaderTitle()}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {isDashboard && (
+              <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
+                <button 
+                  onClick={() => setCurrentMonth(p => Math.max(1, p - 1))}
+                  disabled={currentMonth === 1}
+                  className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
                 >
-                  {[2024, 2025, 2026, 2027, 2028].map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
+                  <ChevronLeft className="w-5 h-5 text-slate-600" />
+                </button>
+                <span className="font-semibold text-slate-800 min-w-[120px] text-center uppercase text-sm tracking-widest">
+                  {getMonthName(currentMonth)}
+                </span>
+                <button 
+                  onClick={() => setCurrentMonth(p => Math.min(12, p + 1))}
+                  disabled={currentMonth === 12}
+                  className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
+                >
+                  <ChevronRight className="w-5 h-5 text-slate-600" />
+                </button>
               </div>
-            </>
-          ) : (
-            <>
-              <h1 className="text-lg font-semibold text-slate-900">
-                Controle Financeiro
-              </h1>
-              {!hideYearSelector && (
-                <div className="flex items-center gap-4">
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(Number(e.target.value))}
-                    className="bg-slate-100 border-none text-sm font-medium rounded-md px-3 py-1.5 cursor-pointer focus:ring-2 focus:ring-slate-900 outline-none"
-                  >
-                    {[2024, 2025, 2026, 2027, 2028].map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </>
-          )}
+            )}
+            {!hideYearSelector && (
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="bg-slate-100 border-none text-sm font-medium rounded-md px-3 py-1.5 cursor-pointer focus:ring-2 focus:ring-slate-900 outline-none h-8"
+              >
+                {[2024, 2025, 2026, 2027, 2028].map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            )}
+          </div>
         </header>
 
         {/* Mobile Header */}

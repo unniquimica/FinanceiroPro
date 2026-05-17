@@ -138,12 +138,15 @@ export function AnnualView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-        <h2 className="text-2xl font-bold tracking-tight">Controle Financeiro {selectedYear}</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 md:hidden">
+        <h2 className="text-2xl font-bold tracking-tight">Visão Anual</h2>
         <div className="text-xs md:text-sm text-slate-500 flex flex-col items-start sm:items-end">
           <p>Clique em qualquer célula para editar valor ou status.</p>
           <p className="md:hidden font-medium text-blue-600">Arraste para os lados para ver todos os meses →</p>
         </div>
+      </div>
+      <div className="hidden md:block text-sm text-slate-500 text-right">
+        Clique em qualquer célula para editar valor ou status.
       </div>
 
       {renderTable(incomes, 'income')}

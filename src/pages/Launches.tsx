@@ -116,10 +116,11 @@ export function Launches() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="sticky top-16 md:top-16 z-20 bg-slate-50 pt-2 pb-4 border-b border-transparent">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <h2 className="text-2xl font-bold tracking-tight">Lançamentos</h2>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 md:mb-0">
+          <h2 className="text-2xl font-bold tracking-tight md:hidden">Lançamentos</h2>
+          <div className="hidden md:block" /> {/* Spacer for desktop */}
           <Button className="gap-2" onClick={() => {
             setDesc('');
             setAmount('');
@@ -238,9 +239,9 @@ export function Launches() {
                     <td className="px-6 py-4 font-medium text-slate-900">
                       {item.launch?.description}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-center">
                       {item.category && (
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white ${item.category.color}`}>
+                        <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium text-white min-w-[120px] shadow-sm ${item.category.color}`}>
                           {item.category.name}
                         </span>
                       )}
