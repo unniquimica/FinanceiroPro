@@ -59,6 +59,34 @@ export function CalculatorModal({ isOpen, onClose }: CalculatorModalProps) {
     }
   };
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      const key = e.key;
+
+      if (/[0-9]/.test(key)) {
+        handleNumber(key);
+      } else if (['+', '-', '*', '/'].includes(key)) {
+        handleOperator(key);
+      } else if (key === 'Enter' || key === '=') {
+        e.preventDefault();
+        handleEqual();
+      } else if (key === 'Escape' || key === 'c' || key === 'C') {
+        handleClear();
+      } else if (key === 'Backspace') {
+        setDisplay(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
+      } else if (key === '.') {
+        if (!display.includes('.')) handleNumber('.');
+      } else if (key === '%') {
+        handleOperator('%');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, display, equation]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <div className={`bg-slate-900 text-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 w-full ${isScientific ? 'max-w-md' : 'max-w-xs'}`}>

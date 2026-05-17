@@ -80,50 +80,50 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Saldo Previsto</CardTitle>
-            <Wallet className="h-4 w-4 text-slate-500" />
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <Card className="md:h-auto overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
+            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Saldo Previsto</CardTitle>
+            <Wallet className="h-3 w-3 md:h-4 md:w-4 text-slate-500" />
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${balance >= 0 ? 'text-slate-900' : 'text-red-600'}`}>
+          <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
+            <div className={`text-sm md:text-2xl font-bold truncate ${balance >= 0 ? 'text-slate-900' : 'text-red-600'}`}>
               {formatCurrency(balance)}
             </div>
-            <p className="text-xs text-slate-500 mt-1">Neste mês</p>
+            <p className="hidden md:block text-xs text-slate-500 mt-1">Neste mês</p>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Receitas Totais</CardTitle>
-            <ArrowUpIcon className="h-4 w-4 text-emerald-500" />
+        <Card className="md:h-auto overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
+            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Receitas Totais</CardTitle>
+            <ArrowUpIcon className="h-3 w-3 md:h-4 md:w-4 text-emerald-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(totalIncome)}</div>
-            <p className="text-xs text-slate-500 mt-1">Recebido: {formatCurrency(received)}</p>
+          <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
+            <div className="text-sm md:text-2xl font-bold text-emerald-600 truncate">{formatCurrency(totalIncome)}</div>
+            <p className="hidden md:block text-xs text-slate-500 mt-1">Recebido: {formatCurrency(received)}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Despesas Totais</CardTitle>
-            <ArrowDownIcon className="h-4 w-4 text-rose-500" />
+        <Card className="md:h-auto overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
+            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Despesas Totais</CardTitle>
+            <ArrowDownIcon className="h-3 w-3 md:h-4 md:w-4 text-rose-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-rose-600">{formatCurrency(totalExpense)}</div>
-            <p className="text-xs text-slate-500 mt-1">Pago: {formatCurrency(paid)}</p>
+          <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
+            <div className="text-sm md:text-2xl font-bold text-rose-600 truncate">{formatCurrency(totalExpense)}</div>
+            <p className="hidden md:block text-xs text-slate-500 mt-1">Pago: {formatCurrency(paid)}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Em Atraso</CardTitle>
-            <AlertCircle className="h-4 w-4 text-amber-500" />
+        <Card className="md:h-auto overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
+            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Em Atraso</CardTitle>
+            <AlertCircle className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{formatCurrency(overdue)}</div>
-            <p className="text-xs text-slate-500 mt-1">Contas vencidas</p>
+          <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
+            <div className="text-sm md:text-2xl font-bold text-amber-600 truncate">{formatCurrency(overdue)}</div>
+            <p className="hidden md:block text-xs text-slate-500 mt-1">Contas vencidas</p>
           </CardContent>
         </Card>
       </div>
