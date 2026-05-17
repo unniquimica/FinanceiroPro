@@ -112,10 +112,6 @@ export function Layout() {
       <div className="md:pl-64 flex flex-col min-h-screen">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10 hidden md:flex">
           <div className="flex items-center gap-3">
-            <div className="font-bold text-lg text-slate-900 flex items-center gap-2 mr-4 border-r border-slate-200 pr-4">
-              <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Logo" className="h-8 object-contain" />
-              <span className="text-base uppercase tracking-wider">Financeiro Pró</span>
-            </div>
             <h1 className="text-xl font-bold tracking-tight text-slate-900">
               {getHeaderTitle()}
             </h1>
@@ -226,7 +222,7 @@ export function Layout() {
           </div>
         )}
 
-        <main className="flex-1 p-4 md:p-8 w-full overflow-x-hidden">
+        <main className="flex-1 p-4 md:px-8 md:py-4 w-full overflow-x-hidden">
           <Outlet />
         </main>
       </div>

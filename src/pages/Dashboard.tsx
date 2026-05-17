@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 import { useFinance } from '../hooks/useFinance';
 import { formatCurrency, getMonthName } from '../utils/formatters';
 import { ArrowDownIcon, ArrowUpIcon, Wallet, AlertCircle } from 'lucide-react';
@@ -53,6 +54,7 @@ export function Dashboard() {
   });
 
   const balance = totalIncome - totalExpense;
+  const hasData = parcels.length > 0;
 
   // Chart Data preparation
   const monthlyData = Array.from({ length: 12 }, (_, i) => {
@@ -80,6 +82,32 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {!hasData && (
+        <Card className="bg-slate-900 border-none shadow-xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32 blur-3xl pointer-events-none" />
+          <CardContent className="p-8 md:p-12 relative flex flex-col md:flex-row items-center gap-8">
+            <div className="bg-white/10 p-4 rounded-2xl">
+              <Wallet className="w-12 h-12 text-white" />
+            </div>
+            <div className="flex-1 text-center md:text-left space-y-2">
+              <h3 className="text-2xl font-bold text-white">Bem-vindo ao Financeiro Pró!</h3>
+              <p className="text-slate-400 max-w-lg">
+                Você ainda não possui lançamentos. Comece adicionando seus gastos e receitas na tela de "Lançamentos" para visualizar seu dashboard completo.
+              </p>
+            </div>
+            <div className="shrink-0">
+               <Button 
+                onClick={() => window.location.href = '/lancamentos'}
+                className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold text-base shadow-lg transition-all hover:scale-105 active:scale-95"
+               >
+                 Começar Agora
+               </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card className="md:h-auto overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">

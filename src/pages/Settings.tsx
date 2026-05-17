@@ -4,13 +4,14 @@ import { Button } from '../components/ui/Button';
 import { Database, Download, Upload, AlertTriangle, CheckCircle2, Users, Key, Eye, EyeOff } from 'lucide-react';
 import { useFinance } from '../hooks/useFinance';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export function Settings() {
-  const { categories, launches, parcels } = useFinance();
+  const { categories, launches, parcels, addCategory, addLaunch, deleteCategory, deleteLaunch } = useFinance();
   const { user, updatePassword } = useAuth();
+  const { showToast } = useToast();
   
   const [isExporting, setIsExporting] = useState(false);
-  const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -24,14 +25,13 @@ export function Settings() {
     try {
       setIsUpdatingPassword(true);
       await updatePassword(currentPassword, newPassword);
-      setMessage({ text: 'Senha alterada com sucesso!', type: 'success' });
+      showToast('Senha alterada com sucesso!', 'success');
       setCurrentPassword('');
       setNewPassword('');
     } catch (error: any) {
-      setMessage({ text: error.message || 'Erro ao alterar a senha.', type: 'error' });
+      showToast(error.message || 'Erro ao alterar a senha.', 'error');
     } finally {
       setIsUpdatingPassword(false);
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -52,25 +52,33 @@ export function Settings() {
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `financeiro-votoshop-backup-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `financeiro-pro-backup-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      setMessage({ text: 'Dados exportados com sucesso!', type: 'success' });
+      showToast('Dados exportados com sucesso!', 'success');
     } catch (error) {
-      setMessage({ text: 'Erro ao exportar os dados.', type: 'error' });
+      showToast('Erro ao exportar os dados.', 'error');
     } finally {
       setIsExporting(false);
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
-  const handleClearData = () => {
-    if (window.confirm('TEM CERTEZA ABSOLUTA? Isso irá apagar todos os lançamentos, contas e parcelas do sistema. Esta ação não tem volta.')) {
-      localStorage.removeItem('@FinancasPro:data:v1');
-      window.location.reload();
+  const handleClearData = async () => {
+    if (window.confirm('TEM CERTEZA ABSOLUTA? Isso irá apagar todos os lançamentos e parcelas. As categorias padrão serão mantidas. Esta ação não tem volta.')) {
+      try {
+        await fetch('/api/data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categories: null, launches: [], parcels: [] })
+        });
+        showToast('Sistema resetado com sucesso.');
+        setTimeout(() => window.location.reload(), 1500);
+      } catch (e) {
+        showToast('Erro ao resetar dados.', 'error');
+      }
     }
   };
 
@@ -82,15 +90,6 @@ export function Settings() {
           <p className="text-sm text-slate-500">Gerencie seus dados e preferências do sistema.</p>
         </div>
       </div>
-
-      {message && (
-        <div className={`p-4 rounded-md flex items-center gap-3 ${
-          message.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
-          {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
-          <span className="font-medium">{message.text}</span>
-        </div>
-      )}
 
       <Card>
         <CardHeader>

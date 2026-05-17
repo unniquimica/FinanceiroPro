@@ -117,8 +117,8 @@ export function Launches() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <div className="sticky top-16 md:top-16 z-20 bg-slate-50 pt-2 pb-4 border-b border-transparent">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 md:mb-0">
+      <div className="sticky top-16 md:top-16 z-20 bg-slate-50 md:-mt-4 md:pt-0 pb-2 border-b border-transparent">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-6">
           <h2 className="text-2xl font-bold tracking-tight md:hidden">Lançamentos</h2>
           <div className="hidden md:block" /> {/* Spacer for desktop */}
           <Button className="gap-2" onClick={() => {
