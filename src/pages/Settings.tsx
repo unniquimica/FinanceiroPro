@@ -5,6 +5,7 @@ import { Database, Download, Upload, AlertTriangle, CheckCircle2, Users, Key, Ey
 import { useFinance } from '../hooks/useFinance';
 import { useAuth } from '../context/AuthContext';
 import { defaultCategories } from '../data/mockData';
+import { supabase } from '../lib/supabase';
 
 export function Settings() {
   const { categories, launches, parcels, restoreData } = useFinance();
@@ -132,15 +133,34 @@ export function Settings() {
         await login(user.email, clearPassword);
         
         // Se chegou aqui, a senha está correta
-        localStorage.removeItem('@FinancasPro:data:v1');
+        // Primeiro, limpa no Supabase para garantir a persistência
+        const { error: resetError } = await supabase
+          .from('user_finance')
+          .upsert({ 
+            user_id: user.id, 
+            data: { categories: defaultCategories, launches: [], parcels: [] },
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (resetError) {
+          throw new Error('Erro ao limpar dados no servidor: ' + resetError.message);
+        }
+
+        // Agora limpa o estado local (redundante mas bom para feedback imediato)
         restoreData({ categories: defaultCategories, launches: [], parcels: [] });
+        localStorage.removeItem('@FinancasPro:data:v1');
+        
         setMessage({ text: 'Sistema resetado com sucesso!', type: 'success' });
         setIsConfirmingClear(false);
         setClearPassword('');
-        setTimeout(() => setMessage(null), 3000);
+        
+        // Pequeno delay para o usuário ver a mensagem de sucesso e então recarregar
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
     } catch (error: any) {
-      setMessage({ text: 'Senha incorreta. Ação cancelada.', type: 'error' });
+      setMessage({ text: error.message || 'Senha incorreta ou erro ao resetar.', type: 'error' });
     } finally {
       setIsClearing(false);
     }
