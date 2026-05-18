@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@layer base {
+  .recharts-wrapper:focus,
+  .recharts-surface:focus,
+  .recharts-rectangle:focus,
+  svg:focus {
+    outline: none !important;
+  }
+}
