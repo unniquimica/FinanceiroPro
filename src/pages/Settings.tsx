@@ -1,21 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Database, Download, Upload, AlertTriangle, CheckCircle2, Users, Key, Eye, EyeOff } from 'lucide-react';
 import { useFinance } from '../hooks/useFinance';
 import { useAuth } from '../context/AuthContext';
+import { defaultCategories } from '../data/mockData';
 
 export function Settings() {
-  const { categories, launches, parcels } = useFinance();
+  const { categories, launches, parcels, restoreData } = useFinance();
   const { user, updatePassword } = useAuth();
   
   const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [isConfirmingClear, setIsConfirmingClear] = useState(false);
+  const [clearPassword, setClearPassword] = useState('');
+  const [isClearing, setIsClearing] = useState(false);
+
+  const { login } = useAuth();
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,10 +77,72 @@ export function Settings() {
     }
   };
 
-  const handleClearData = () => {
-    if (window.confirm('TEM CERTEZA ABSOLUTA? Isso irá apagar todos os lançamentos, contas e parcelas do sistema. Esta ação não tem volta.')) {
-      localStorage.removeItem('@FinancasPro:data:v1');
-      window.location.reload();
+  const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+        
+        if (data && (data.categories || data.launches || data.parcels)) {
+          if (window.confirm('CUIDADO: Isso irá substituir todos os seus dados atuais pelos dados deste backup. Deseja continuar?')) {
+            restoreData(data);
+            setMessage({ text: 'Backup restaurado com sucesso!', type: 'success' });
+          }
+        } else {
+          setMessage({ text: 'Arquivo de backup inválido ou vazio.', type: 'error' });
+        }
+      } catch (error) {
+        console.error('Import error:', error);
+        setMessage({ text: 'Erro ao ler o arquivo de backup. Verifique se é um JSON válido.', type: 'error' });
+      } finally {
+        setIsImporting(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setTimeout(() => setMessage(null), 3000);
+      }
+    };
+    reader.onerror = () => {
+      setMessage({ text: 'Erro ao carregar o arquivo.', type: 'error' });
+      setIsImporting(false);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleClearData = async () => {
+    if (!isConfirmingClear) {
+      if (window.confirm('TEM CERTEZA ABSOLUTA? Isso irá apagar TODOS os dados do sistema. Esta ação não pode ser desfeita.')) {
+        setIsConfirmingClear(true);
+      }
+      return;
+    }
+
+    if (!clearPassword) {
+      setMessage({ text: 'Por favor, insira sua senha para confirmar.', type: 'error' });
+      return;
+    }
+
+    try {
+      setIsClearing(true);
+      // Re-autentica para verificar se a senha está correta
+      if (user?.email) {
+        await login(user.email, clearPassword);
+        
+        // Se chegou aqui, a senha está correta
+        localStorage.removeItem('@FinancasPro:data:v1');
+        restoreData({ categories: defaultCategories, launches: [], parcels: [] });
+        setMessage({ text: 'Sistema resetado com sucesso!', type: 'success' });
+        setIsConfirmingClear(false);
+        setClearPassword('');
+        setTimeout(() => setMessage(null), 3000);
+      }
+    } catch (error: any) {
+      setMessage({ text: 'Senha incorreta. Ação cancelada.', type: 'error' });
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -172,23 +244,76 @@ export function Settings() {
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between p-4 border border-slate-200 rounded-lg">
             <div>
               <h4 className="font-medium text-slate-900">Restaurar Backup</h4>
-              <p className="text-sm text-slate-500">Importe um arquivo JSON gerado anteriormente. (Em breve)</p>
+              <p className="text-sm text-slate-500">Importe um arquivo JSON gerado anteriormente.</p>
             </div>
-            <Button disabled variant="secondary" className="gap-2 shrink-0">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImportData}
+              accept=".json"
+              className="hidden"
+            />
+            <Button 
+              onClick={() => fileInputRef.current?.click()} 
+              disabled={isImporting} 
+              variant="secondary" 
+              className="gap-2 shrink-0"
+            >
               <Upload className="w-4 h-4" />
-              Importar Dados
+              {isImporting ? 'Importando...' : 'Importar Dados'}
             </Button>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between p-4 border border-red-100 bg-red-50/50 rounded-lg">
-            <div>
-              <h4 className="font-medium text-red-800">Apagar Tudo</h4>
-              <p className="text-sm text-red-600/80">Isto excluirá permanentemente todas as suas categorias, lançamentos e pagamentos.</p>
+          <div className="flex flex-col gap-4 p-4 border border-red-100 bg-red-50/50 rounded-lg">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between ">
+              <div>
+                <h4 className="font-medium text-red-800">Apagar Tudo</h4>
+                <p className="text-sm text-red-600/80">Isto excluirá permanentemente todas as suas categorias, lançamentos e pagamentos.</p>
+              </div>
+              {!isConfirmingClear && (
+                <Button onClick={handleClearData} variant="destructive" className="shrink-0 gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  Resetar Sistema
+                </Button>
+              )}
             </div>
-            <Button onClick={handleClearData} variant="destructive" className="shrink-0 gap-2">
-              <AlertTriangle className="w-4 h-4" />
-              Resetar Sistema
-            </Button>
+
+            {isConfirmingClear && (
+              <div className="mt-2 space-y-3 p-4 bg-white border border-red-200 rounded-md shadow-sm">
+                <p className="text-sm font-semibold text-red-700 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  Confirme sua senha para continuar
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="password"
+                    placeholder="Sua senha de acesso"
+                    value={clearPassword}
+                    onChange={(e) => setClearPassword(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="destructive" 
+                      onClick={handleClearData}
+                      disabled={isClearing || !clearPassword}
+                    >
+                      {isClearing ? 'Apagando...' : 'Confirmar e Apagar'}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setIsConfirmingClear(false);
+                        setClearPassword('');
+                      }}
+                      disabled={isClearing}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

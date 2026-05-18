@@ -20,6 +20,7 @@ interface FinanceContextType {
   addCategory: (category: Category) => void;
   updateCategory: (category: Category) => void;
   deleteCategory: (categoryId: string) => void;
+  restoreData: (data: { categories?: Category[]; launches?: Launch[]; parcels?: Parcel[] }) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -142,6 +143,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setCategories(prev => prev.filter(c => c.id !== categoryId));
   };
 
+  const restoreData = (data: { categories?: Category[]; launches?: Launch[]; parcels?: Parcel[] }) => {
+    if (data.categories) setCategories(data.categories);
+    if (data.launches) setLaunches(data.launches);
+    if (data.parcels) setParcels(data.parcels);
+  };
+
   if (!isLoaded) return <div className="flex h-screen items-center justify-center text-slate-500">Carregando dados financeiros...</div>;
 
   return (
@@ -162,6 +169,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addCategory,
         updateCategory,
         deleteCategory,
+        restoreData,
       }}
     >
       {children}
