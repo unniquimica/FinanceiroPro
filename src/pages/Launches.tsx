@@ -317,15 +317,6 @@ export function Launches() {
                   <input required type="text" value={desc} onChange={e => setDesc(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
-                  <select required value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
-                    {categories.filter(c => c.type === 'both' || c.type === type).map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
@@ -333,6 +324,28 @@ export function Launches() {
                       <option value="expense">Despesa</option>
                       <option value="income">Receita</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
+                    <select required value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
+                      {categories.filter(c => c.type === 'both' || c.type === type).map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Valor desta parcela (R$)</label>
+                    <input required type="text" value={amount} onChange={e => {
+                      let value = e.target.value.replace(/\D/g, "");
+                      if (!value) return setAmount("");
+                      value = (Number(value) / 100).toFixed(2);
+                      value = value.replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+                      setAmount(value);
+                    }} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
                   </div>
                   
                   <div>
@@ -345,17 +358,6 @@ export function Launches() {
                       <option value="cancelled">Cancelado</option>
                     </select>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Valor desta parcela (R$)</label>
-                  <input required type="text" value={amount} onChange={e => {
-                    let value = e.target.value.replace(/\D/g, "");
-                    if (!value) return setAmount("");
-                    value = (Number(value) / 100).toFixed(2);
-                    value = value.replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-                    setAmount(value);
-                  }} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
                 </div>
               </div>
 
@@ -382,15 +384,6 @@ export function Launches() {
                   <input required type="text" value={desc} onChange={e => setDesc(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="Ex: Conta de Luz" />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
-                  <select required value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
-                    {categories.filter(c => c.type === 'both' || c.type === type).map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
@@ -401,6 +394,17 @@ export function Launches() {
                   </div>
                   
                   <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
+                    <select required value={categoryId} onChange={e => setCategoryId(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md">
+                      {categories.filter(c => c.type === 'both' || c.type === type).map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Valor da Parcela (R$)</label>
                     <input required type="text" value={amount} onChange={e => {
                       let value = e.target.value.replace(/\D/g, "");
@@ -410,22 +414,20 @@ export function Launches() {
                       setAmount(value);
                     }} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Parcelas</label>
                     <input required type="number" min="1" max="120" value={installments} onChange={e => setInstallments(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" />
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Mês Inicial</label>
-                    <select value={startMonth} onChange={e => setStartMonth(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white">
-                      {Array.from({ length: 12 }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>{getMonthName(i + 1)}</option>
-                      ))}
-                    </select>
-                  </div>
+                <div>
+                   <label className="block text-sm font-medium text-slate-700 mb-1">Mês Inicial</label>
+                   <select value={startMonth} onChange={e => setStartMonth(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white">
+                     {Array.from({ length: 12 }, (_, i) => (
+                       <option key={i + 1} value={i + 1}>{getMonthName(i + 1)}</option>
+                     ))}
+                   </select>
                 </div>
               </div>
 
