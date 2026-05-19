@@ -105,8 +105,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [categories, launches, parcels, isLoaded, user]);
 
   const addLaunch = (launch: Launch, newParcels: Parcel[]) => {
-    setLaunches(prev => [...prev, launch]);
-    setParcels(prev => [...prev, ...newParcels]);
+    setLaunches(prev => [launch, ...prev]);
+    setParcels(prev => [...newParcels, ...prev]);
   };
 
   const updateLaunch = (launch: Launch) => {

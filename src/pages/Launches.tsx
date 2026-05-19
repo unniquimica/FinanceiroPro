@@ -28,6 +28,7 @@ export function Launches() {
   const [amount, setAmount] = useState('');
   const [startMonth, setStartMonth] = useState(new Date().getMonth() + 1);
   const [installments, setInstallments] = useState('1');
+  const [notes, setNotes] = useState('');
   const [editStatus, setEditStatus] = useState<ParcelStatus>('pending');
   const [deleteConfirm, setDeleteConfirm] = useState<Parcel | null>(null);
 
@@ -88,7 +89,8 @@ export function Launches() {
       amount: numAmount,
       installments: numInstallments,
       startMonth,
-      startYear: selectedYear
+      startYear: selectedYear,
+      notes
     };
 
     const newParcels: Parcel[] = [];
@@ -102,7 +104,8 @@ export function Launches() {
         amount: numAmount,
         month: currentMonth,
         year: currentYear,
-        status: type === 'income' ? 'pending' : 'pending' // default pending
+        status: type === 'income' ? 'pending' : 'pending', // default pending
+        notes
       });
       currentMonth++;
       if (currentMonth > 12) {
@@ -274,6 +277,7 @@ export function Launches() {
                         setType(item.launch!.type);
                         setCategoryId(item.launch!.categoryId);
                         setEditStatus(item.status);
+                        setNotes(item.notes || item.launch?.notes || '');
                         setEditingParcel({ parcel: item, launch: item.launch! });
                       }}>
                         <Edit2 className="w-4 h-4 text-slate-500 hover:text-blue-600" />
@@ -305,9 +309,9 @@ export function Launches() {
 
               const numAmount = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
               // Update Parcel
-              updateParcel({ ...editingParcel.parcel, amount: numAmount, status: editStatus });
+              updateParcel({ ...editingParcel.parcel, amount: numAmount, status: editStatus, notes });
               // Update Launch (this updates it globally for all future parcel views)
-              updateLaunch({ ...editingParcel.launch, description: desc, type, categoryId });
+              updateLaunch({ ...editingParcel.launch, description: desc, type, categoryId, notes });
               
               setEditingParcel(null);
             }} className="p-6 space-y-4">
@@ -358,6 +362,17 @@ export function Launches() {
                       <option value="cancelled">Cancelado</option>
                     </select>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Observações</label>
+                  <textarea 
+                    value={notes} 
+                    onChange={e => setNotes(e.target.value)} 
+                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" 
+                    rows={3}
+                    placeholder="Alguma observação importante?"
+                  />
                 </div>
               </div>
 
@@ -428,6 +443,17 @@ export function Launches() {
                        <option key={i + 1} value={i + 1}>{getMonthName(i + 1)}</option>
                      ))}
                    </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Observações</label>
+                  <textarea 
+                    value={notes} 
+                    onChange={e => setNotes(e.target.value)} 
+                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900" 
+                    rows={3}
+                    placeholder="Alguma observação importante?"
+                  />
                 </div>
               </div>
 

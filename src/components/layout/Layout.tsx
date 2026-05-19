@@ -5,6 +5,7 @@ import { useFinance } from '../../hooks/useFinance';
 import { ChevronLeft, ChevronRight, Menu, X, LayoutDashboard, CalendarDays, Receipt, Bookmark, Settings, Calculator } from 'lucide-react';
 import { getMonthName } from '../../utils/formatters';
 import { CalculatorModal } from '../CalculatorModal';
+import { QuickLaunchModal } from '../QuickLaunchModal';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../utils/formatters';
 
@@ -35,6 +36,7 @@ export function Layout() {
   };
 
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [isQuickLaunchOpen, setIsQuickLaunchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -43,6 +45,7 @@ export function Layout() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
       <Sidebar onOpenCalculator={() => setIsCalculatorOpen(true)} />
       <CalculatorModal isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+      <QuickLaunchModal isOpen={isQuickLaunchOpen} onClose={() => setIsQuickLaunchOpen(false)} />
       
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
@@ -167,6 +170,18 @@ export function Layout() {
               <span className="text-sm">Financeiro Pró</span>
             </div>
           </div>
+
+          <button 
+            onClick={() => setIsQuickLaunchOpen(true)}
+            className="p-2 -mr-1 animate-pulse"
+            title="Lançamento Rápido"
+          >
+            <img 
+              src="https://static.vecteezy.com/system/resources/thumbnails/047/247/671/small_2x/flying-space-rocket-with-spewing-fire-spaceship-launch-3d-rendering-icon-illustration-png.png" 
+              alt="Quick Launch" 
+              className="h-9 w-9 object-contain drop-shadow-sm active:scale-95 transition-transform"
+            />
+          </button>
         </header>
 
         {/* Mobile Sub-Header for Selectors */}
