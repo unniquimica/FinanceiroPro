@@ -53,7 +53,7 @@ export function QuickLaunchModal({ isOpen, onClose }: QuickLaunchModalProps) {
       amount: numAmount,
       month: month,
       year: year,
-      status: 'pending',
+      status: 'paid',
       notes
     };
 
