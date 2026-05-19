@@ -14,8 +14,6 @@ export function QuickLaunchModal({ isOpen, onClose }: QuickLaunchModalProps) {
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [type, setType] = useState<TransactionType | ''>('');
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [year, setYear] = useState(new Date().getFullYear());
   const [notes, setNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -34,6 +32,9 @@ export function QuickLaunchModal({ isOpen, onClose }: QuickLaunchModalProps) {
       : categoryId;
     
     const launchId = Math.random().toString(36).substr(2, 9);
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
 
     const newLaunch: Launch = {
       id: launchId,
@@ -42,8 +43,8 @@ export function QuickLaunchModal({ isOpen, onClose }: QuickLaunchModalProps) {
       type: finalType,
       amount: numAmount,
       installments: 1,
-      startMonth: month,
-      startYear: year,
+      startMonth: currentMonth,
+      startYear: currentYear,
       notes
     };
 
@@ -51,9 +52,9 @@ export function QuickLaunchModal({ isOpen, onClose }: QuickLaunchModalProps) {
       id: Math.random().toString(36).substr(2, 9),
       launchId,
       amount: numAmount,
-      month: month,
-      year: year,
-      status: 'paid',
+      month: currentMonth,
+      year: currentYear,
+      status: finalType === 'income' ? 'received' : 'paid',
       notes
     };
 
@@ -104,31 +105,6 @@ export function QuickLaunchModal({ isOpen, onClose }: QuickLaunchModalProps) {
                   className="w-full pl-10 pr-4 py-3 text-2xl font-bold border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all"
                   placeholder="0,00"
                 />
-              </div>
-            </div>
-
-            {/* Mês Referência - Editable */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-bold text-slate-700">Mês Referência</label>
-              <div className="grid grid-cols-2 gap-4">
-                <select 
-                  value={month} 
-                  onChange={e => setMonth(Number(e.target.value))} 
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 font-medium focus:ring-2 focus:ring-slate-900 transition-all"
-                >
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>{getMonthName(i + 1)}</option>
-                  ))}
-                </select>
-                <select 
-                  value={year} 
-                  onChange={e => setYear(Number(e.target.value))} 
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 font-medium focus:ring-2 focus:ring-slate-900 transition-all"
-                >
-                  {[2024, 2025, 2026, 2027].map(y => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
               </div>
             </div>
 
