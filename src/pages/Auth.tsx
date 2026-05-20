@@ -57,8 +57,8 @@ export function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md shadow-lg border-slate-200">
         <CardHeader className="text-center pb-2 flex flex-col items-center">
-          <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Financeiro Pró Logo" className="h-16 object-contain mb-2" />
-          <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">
+          <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Financeiro Pró Logo" className="h-20 object-contain mb-2" />
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-slate-900">
             Financeiro Pró
           </CardTitle>
           <CardDescription>

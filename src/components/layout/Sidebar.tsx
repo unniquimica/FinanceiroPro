@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'Visão Anual', path: '/anual', icon: CalendarDays },
+  { name: 'Visão Mensal', path: '/anual', icon: CalendarDays },
   { name: 'Lançamentos', path: '/lancamentos', icon: Receipt },
   { name: 'Categorias', path: '/categorias', icon: Bookmark },
   { name: 'Configurações', path: '/configuracoes', icon: Settings },
@@ -17,8 +17,8 @@ export function Sidebar({ onOpenCalculator }: { onOpenCalculator?: () => void })
   return (
     <aside className="w-64 bg-slate-50 border-r border-slate-200 hidden md:flex flex-col h-screen fixed top-0 left-0">
       <div className="h-16 flex items-center px-6 border-b border-slate-200">
-        <div className="flex items-center gap-2 font-bold text-lg text-slate-900 tracking-tight">
-          <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Financeiro Pró Logo" className="h-8 object-contain" />
+        <div className="flex items-center gap-2.5 font-extrabold text-xl text-slate-900 tracking-tight">
+          <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Financeiro Pró Logo" className="h-10 object-contain" />
           Financeiro Pró
         </div>
       </div>

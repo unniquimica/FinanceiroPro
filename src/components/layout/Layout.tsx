@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation, NavLink } from 'react-router-dom';
+import { Outlet, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { useFinance } from '../../hooks/useFinance';
 import { ChevronLeft, ChevronRight, Menu, X, LayoutDashboard, CalendarDays, Receipt, Bookmark, Settings, Calculator } from 'lucide-react';
@@ -11,7 +11,7 @@ import { cn } from '../../utils/formatters';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'Visão Anual', path: '/anual', icon: CalendarDays },
+  { name: 'Visão Mensal', path: '/anual', icon: CalendarDays },
   { name: 'Lançamentos', path: '/lancamentos', icon: Receipt },
   { name: 'Categorias', path: '/categorias', icon: Bookmark },
   { name: 'Configurações', path: '/configuracoes', icon: Settings },
@@ -21,13 +21,56 @@ export function Layout() {
   const { selectedYear, setSelectedYear, currentMonth, setCurrentMonth } = useFinance();
   const { logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const hideYearSelector = location.pathname === '/categorias' || location.pathname === '/configuracoes';
   const isDashboard = location.pathname === '/';
+
+  // Touch gesture swipe handling
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+  const [touchEndY, setTouchEndY] = useState<number | null>(null);
+
+  const minSwipeDistance = 60;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEndX(null);
+    setTouchEndY(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+    setTouchEndY(e.targetTouches[0].clientY);
+  };
+
+  const onTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null || touchStartY === null || touchEndY === null) return;
+    
+    const deltaX = touchStartX - touchEndX;
+    const deltaY = touchStartY - touchEndY;
+    
+    // Ensure gesture is horizontal
+    if (Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      if (Math.abs(deltaX) > minSwipeDistance) {
+        const paths = ['/', '/anual', '/lancamentos', '/categorias', '/configuracoes'];
+        const currentIdx = paths.indexOf(location.pathname);
+        if (currentIdx !== -1) {
+          if (deltaX > 0 && currentIdx < paths.length - 1) {
+            navigate(paths[currentIdx + 1]);
+          } else if (deltaX < 0 && currentIdx > 0) {
+            navigate(paths[currentIdx - 1]);
+          }
+        }
+      }
+    }
+  };
   
   const getHeaderTitle = () => {
     switch (location.pathname) {
       case '/': return 'Dashboard';
-      case '/anual': return 'Visão Anual';
+      case '/anual': return 'Visão Mensal';
       case '/lancamentos': return 'Lançamentos';
       case '/categorias': return 'Categorias';
       case '/configuracoes': return 'Configurações';
@@ -42,7 +85,12 @@ export function Layout() {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
+    <div 
+      className="min-h-screen bg-slate-50 font-sans text-slate-900 overflow-x-hidden"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <Sidebar onOpenCalculator={() => setIsCalculatorOpen(true)} />
       <CalculatorModal isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
       <QuickLaunchModal isOpen={isQuickLaunchOpen} onClose={() => setIsQuickLaunchOpen(false)} />
@@ -61,8 +109,8 @@ export function Layout() {
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100">
-          <div className="flex items-center gap-2 font-bold text-slate-900">
-            <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Logo" className="h-6 object-contain" />
+          <div className="flex items-center gap-2.5 font-extrabold text-xl text-slate-900 tracking-tight">
+            <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Logo" className="h-8 object-contain" />
             <span>Financeiro Pró</span>
           </div>
           <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 -mr-2 text-slate-500">
@@ -143,15 +191,25 @@ export function Layout() {
               </div>
             )}
             {!hideYearSelector && (
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="bg-slate-100 border-none text-sm font-medium rounded-md px-3 py-1.5 cursor-pointer focus:ring-2 focus:ring-slate-900 outline-none h-8"
-              >
-                {[2024, 2025, 2026, 2027, 2028].map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                <button 
+                  onClick={() => setSelectedYear(selectedYear - 1)}
+                  disabled={selectedYear <= 2025}
+                  className="p-1 rounded-md hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4 text-slate-700" />
+                </button>
+                <span className="font-bold text-slate-800 min-w-[50px] text-center text-xs font-mono leading-none">
+                  {selectedYear}
+                </span>
+                <button 
+                  onClick={() => setSelectedYear(selectedYear + 1)}
+                  disabled={selectedYear >= 2075}
+                  className="p-1 rounded-md hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 text-slate-700" />
+                </button>
+              </div>
             )}
           </div>
         </header>
@@ -165,9 +223,9 @@ export function Layout() {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <div className="font-bold text-lg text-slate-900 flex items-center gap-2">
-              <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Logo" className="h-6 object-contain" />
-              <span className="text-sm">Financeiro Pró</span>
+            <div className="font-extrabold text-lg text-slate-900 flex items-center gap-2.5">
+              <img src="https://finance.tradecontrol.net/img/fc_logo.webp" alt="Logo" className="h-8 object-contain" />
+              <span className="text-base tracking-tight font-black">Financeiro Pró</span>
             </div>
           </div>
 
@@ -185,55 +243,49 @@ export function Layout() {
         </header>
 
         {/* Mobile Sub-Header for Selectors */}
-        {!hideYearSelector && (
+        {isDashboard && (
           <div className="bg-white border-b border-slate-200 px-4 py-3 md:hidden flex items-center justify-between sticky top-16 z-30 shadow-sm animate-in slide-in-from-top duration-300">
-            {isDashboard ? (
-              <div className="flex items-center gap-3 w-full">
-                <div className="flex-1 flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-sm">
-                  <button 
-                    onClick={() => setCurrentMonth(p => Math.max(1, p - 1))}
-                    disabled={currentMonth === 1}
-                    className="p-2 rounded-lg hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-slate-700" />
-                  </button>
-                  <span className="flex-1 font-bold text-slate-900 text-center uppercase text-sm tracking-widest py-1">
-                    {getMonthName(currentMonth)}
-                  </span>
-                  <button 
-                    onClick={() => setCurrentMonth(p => Math.min(12, p + 1))}
-                    disabled={currentMonth === 12}
-                    className="p-2 rounded-lg hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
-                  >
-                    <ChevronRight className="w-5 h-5 text-slate-700" />
-                  </button>
-                </div>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="bg-slate-100 border border-slate-200 text-sm font-bold rounded-xl px-4 py-2.5 cursor-pointer w-28 outline-none focus:ring-2 focus:ring-slate-900 shadow-sm appearance-none text-center"
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1 flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-sm">
+                <button 
+                  onClick={() => setCurrentMonth(p => Math.max(1, p - 1))}
+                  disabled={currentMonth === 1}
+                  className="p-2 rounded-lg hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
                 >
-                  {[2024, 2025, 2026, 2027, 2028].map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
+                  <ChevronLeft className="w-5 h-5 text-slate-700" />
+                </button>
+                <span className="flex-1 font-bold text-slate-900 text-center uppercase text-sm tracking-widest py-1">
+                  {getMonthName(currentMonth)}
+                </span>
+                <button 
+                  onClick={() => setCurrentMonth(p => Math.min(12, p + 1))}
+                  disabled={currentMonth === 12}
+                  className="p-2 rounded-lg hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 text-slate-700" />
+                </button>
               </div>
-            ) : (
-              <div className="flex items-center justify-center w-full">
-                <div className="flex items-center gap-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200 shadow-sm w-full max-w-xs">
-                  <span className="pl-3 text-xs font-bold text-slate-500 uppercase tracking-widest">Ano Fiscal</span>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(Number(e.target.value))}
-                    className="flex-1 bg-white border border-slate-200 text-base font-bold rounded-lg px-4 py-2 cursor-pointer outline-none focus:ring-2 focus:ring-slate-900 text-center"
-                  >
-                    {[2024, 2025, 2026, 2027, 2028].map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
+              
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-sm w-32 shrink-0">
+                <button 
+                  onClick={() => setSelectedYear(selectedYear - 1)}
+                  disabled={selectedYear <= 2025}
+                  className="p-2 rounded-lg hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4 text-slate-700" />
+                </button>
+                <span className="flex-1 font-bold text-slate-900 text-center text-xs font-mono leading-none py-1">
+                  {selectedYear}
+                </span>
+                <button 
+                  onClick={() => setSelectedYear(selectedYear + 1)}
+                  disabled={selectedYear >= 2075}
+                  className="p-2 rounded-lg hover:bg-white active:bg-white disabled:opacity-50 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 text-slate-700" />
+                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
 

@@ -80,50 +80,66 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <Card className="md:h-auto overflow-hidden">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <Card className="overflow-hidden border-slate-200">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
-            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Saldo Previsto</CardTitle>
-            <Wallet className="h-3 w-3 md:h-4 md:w-4 text-slate-500" />
+            <CardTitle className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">Saldo Realizado</CardTitle>
+            <Wallet className="h-3.5 w-3.5 md:h-5 md:w-5 text-slate-500" />
           </CardHeader>
           <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
-            <div className={`text-sm md:text-2xl font-bold truncate ${balance >= 0 ? 'text-slate-900' : 'text-red-600'}`}>
-              {formatCurrency(balance)}
+            <div className={`text-sm md:text-2xl font-extrabold truncate ${(received - paid) >= 0 ? 'text-slate-900' : 'text-red-600'}`}>
+              {formatCurrency(received - paid)}
             </div>
-            <p className="hidden md:block text-xs text-slate-500 mt-1">Neste mês</p>
+            <p className="text-[9px] md:text-xs text-slate-500 mt-1 font-medium truncate">
+              Previsto: <span className={(totalIncome - totalExpense) >= 0 ? 'text-slate-700 font-bold' : 'text-red-500 font-bold'}>
+                {formatCurrency(totalIncome - totalExpense)}
+              </span>
+            </p>
           </CardContent>
         </Card>
         
-        <Card className="md:h-auto overflow-hidden">
+        <Card className="overflow-hidden border-slate-200">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
-            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Receitas Totais</CardTitle>
-            <ArrowUpIcon className="h-3 w-3 md:h-4 md:w-4 text-emerald-500" />
+            <CardTitle className="text-[10px] md:text-xs font-semibold text-emerald-750 uppercase tracking-wider">Receitas Reais</CardTitle>
+            <ArrowUpIcon className="h-3.5 w-3.5 md:h-5 md:w-5 text-emerald-500" />
           </CardHeader>
           <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
-            <div className="text-sm md:text-2xl font-bold text-emerald-600 truncate">{formatCurrency(totalIncome)}</div>
-            <p className="hidden md:block text-xs text-slate-500 mt-1">Recebido: {formatCurrency(received)}</p>
+            <div className="text-sm md:text-2xl font-extrabold text-emerald-600 truncate">
+              {formatCurrency(received)}
+            </div>
+            <p className="text-[9px] md:text-xs text-slate-500 mt-1 font-medium truncate">
+              Previsto: <span className="text-emerald-600 font-bold">{formatCurrency(totalIncome)}</span>
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="md:h-auto overflow-hidden">
+        <Card className="overflow-hidden border-slate-200">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
-            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Despesas Totais</CardTitle>
-            <ArrowDownIcon className="h-3 w-3 md:h-4 md:w-4 text-rose-500" />
+            <CardTitle className="text-[10px] md:text-xs font-semibold text-rose-750 uppercase tracking-wider">Despesas Realizadas</CardTitle>
+            <ArrowDownIcon className="h-3.5 w-3.5 md:h-5 md:w-5 text-rose-500" />
           </CardHeader>
           <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
-            <div className="text-sm md:text-2xl font-bold text-rose-600 truncate">{formatCurrency(totalExpense)}</div>
-            <p className="hidden md:block text-xs text-slate-500 mt-1">Pago: {formatCurrency(paid)}</p>
+            <div className="text-sm md:text-2xl font-extrabold text-rose-600 truncate">
+              {formatCurrency(paid)}
+            </div>
+            <p className="text-[9px] md:text-xs text-slate-500 mt-1 font-medium truncate">
+              Previsto: <span className="text-rose-600 font-bold">{formatCurrency(totalExpense)}</span>
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="md:h-auto overflow-hidden">
+        <Card className="overflow-hidden border-slate-200">
           <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3 md:pb-2 md:pt-6 md:px-6">
-            <CardTitle className="text-[10px] md:text-sm font-medium text-slate-500">Em Atraso</CardTitle>
-            <AlertCircle className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
+            <CardTitle className="text-[10px] md:text-xs font-semibold text-amber-750 uppercase tracking-wider">Em Atraso</CardTitle>
+            <AlertCircle className="h-3.5 w-3.5 md:h-5 md:w-5 text-amber-500" />
           </CardHeader>
           <CardContent className="pb-3 pt-0 px-3 md:pb-6 md:pt-0 md:px-6">
-            <div className="text-sm md:text-2xl font-bold text-amber-600 truncate">{formatCurrency(overdue)}</div>
-            <p className="hidden md:block text-xs text-slate-500 mt-1">Contas vencidas</p>
+            <div className="text-sm md:text-2xl font-extrabold text-amber-600 truncate">
+              {formatCurrency(overdue)}
+            </div>
+            <p className="text-[9px] md:text-xs text-slate-500 mt-1 font-medium truncate">
+              Previsto: <span className="text-amber-600 font-bold">{formatCurrency(overdue + (totalExpense - paid))}</span>
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -144,7 +160,6 @@ export function Dashboard() {
                     formatter={(value) => formatCurrency(value as number)}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
                   />
-                  <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
                   <Bar dataKey="Receitas" fill="#10B981" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="Despesas" fill="#F43F5E" radius={[4, 4, 0, 0]} />
                 </BarChart>

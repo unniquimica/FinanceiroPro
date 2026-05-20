@@ -8,7 +8,7 @@ import { Plus, Search, Filter, MoreHorizontal, CheckCircle2, XCircle, AlertCircl
 import { Parcel, ParcelStatus, Launch, TransactionType } from '../types';
 
 export function Launches() {
-  const { parcels, launches, categories, selectedYear, updateParcel, addLaunch, updateLaunch, deleteLaunch, deleteParcel } = useFinance();
+  const { parcels, launches, categories, selectedYear, setSelectedYear, updateParcel, addLaunch, updateLaunch, deleteLaunch, deleteParcel } = useFinance();
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [search, setSearch] = useState('');
   
@@ -120,7 +120,7 @@ export function Launches() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <div className="sticky top-16 md:top-16 z-20 bg-slate-50 md:-mt-4 md:pt-0 pb-2 border-b border-transparent">
+      <div className="sticky top-16 md:top-16 z-20 bg-slate-50 -mt-4 md:-mt-4 md:pt-0 pb-2 border-b border-transparent">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-6">
           <h2 className="text-2xl font-bold tracking-tight md:hidden">Lançamentos</h2>
           <div className="hidden md:block" /> {/* Spacer for desktop */}
@@ -139,8 +139,9 @@ export function Launches() {
         </div>
 
         <Card className="shadow-lg border-slate-200">
-          <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row gap-4 justify-between bg-white rounded-t-xl">
-            <div className="flex flex-1 gap-4">
+          {/* Desktop Filter Header */}
+          <div className="hidden md:flex p-4 border-b border-slate-100 flex-row gap-4 justify-between bg-white rounded-t-xl items-center">
+            <div className="flex flex-1 gap-4 items-center">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input 
@@ -148,13 +149,13 @@ export function Launches() {
                   placeholder="Buscar lançamento..." 
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                  className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white font-medium"
                 />
               </div>
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white cursor-pointer"
+                className="px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white cursor-pointer font-medium"
               >
                 <option value="0">Todos os meses</option>
                 {Array.from({ length: 12 }, (_, i) => (
@@ -180,11 +181,65 @@ export function Launches() {
             </div>
           </div>
 
+          {/* Mobile Filter Header */}
+          <div className="flex md:hidden flex-col p-4 border-b border-slate-100 gap-3 bg-white rounded-t-xl">
+            {/* Linha 1: Busca */}
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Buscar lançamento..." 
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 bg-slate-50 font-semibold text-slate-800"
+              />
+            </div>
+            {/* Linha 2: MÊS, ANO e FUNIL */}
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                className="flex-[2] min-w-0 bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-2.5 py-2.5 cursor-pointer outline-none focus:ring-2 focus:ring-slate-900 text-center"
+              >
+                <option value="0">MÊS: TODOS</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>{getMonthName(i + 1).toUpperCase()}</option>
+                ))}
+              </select>
+
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="w-24 bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-2.5 py-2.5 cursor-pointer outline-none focus:ring-2 focus:ring-slate-900 text-center"
+              >
+                {Array.from({ length: 50 }, (_, i) => 2025 + i).map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+
+              <Button 
+                variant={showFilters ? "default" : "outline"} 
+                className="shrink-0 h-9 w-9 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center text-xs font-bold p-0" 
+                onClick={() => {
+                  if (showFilters) {
+                    setFilterType('all');
+                    setFilterStatus('all');
+                    setFilterMinVal('');
+                    setFilterMaxVal('');
+                  }
+                  setShowFilters(!showFilters);
+                }}
+              >
+                <Filter className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
           {showFilters && (
-            <div className="p-4 border-b border-slate-100 bg-slate-50 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-4 border-b border-slate-100 bg-slate-50 grid grid-cols-1 md:grid-cols-4 gap-4 animate-in slide-in-from-top duration-200">
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-500">Tipo</label>
-                <select value={filterType} onChange={e => setFilterType(e.target.value)} className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white">
+                <select value={filterType} onChange={e => setFilterType(e.target.value)} className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white font-medium">
                   <option value="all">Todos</option>
                   <option value="income">Receita</option>
                   <option value="expense">Despesa</option>
@@ -192,7 +247,7 @@ export function Launches() {
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-500">Status</label>
-                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white">
+                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white font-medium">
                   <option value="all">Todos</option>
                   <option value="pending">Pendente</option>
                   <option value="paid">Pago</option>
@@ -203,75 +258,73 @@ export function Launches() {
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-500">Valor Mínimo (R$)</label>
-                <input type="number" value={filterMinVal} onChange={e => setFilterMinVal(e.target.value)} placeholder="Ex: 100" className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white" />
+                <input type="number" value={filterMinVal} onChange={e => setFilterMinVal(e.target.value)} placeholder="Ex: 100" className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white font-medium" />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-500">Valor Máximo (R$)</label>
-                <input type="number" value={filterMaxVal} onChange={e => setFilterMaxVal(e.target.value)} placeholder="Ex: 5000" className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white" />
+                <input type="number" value={filterMaxVal} onChange={e => setFilterMaxVal(e.target.value)} placeholder="Ex: 5000" className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md bg-white font-medium" />
               </div>
             </div>
           )}
         </Card>
       </div>
 
-      <Card>
-        <div className="overflow-x-auto scrollbar-hide">
-          <p className="md:hidden text-[10px] text-blue-600 font-medium px-6 py-2 bg-slate-50 border-b border-slate-100">Arraste para o lado para ver mais informações →</p>
+      <Card className="border-slate-200 overflow-hidden shadow-md">
+        {/* Desktop view: Table */}
+        <div className="hidden md:block overflow-x-auto scrollbar-hide">
           <table className="w-full text-sm text-left min-w-[800px]">
-            <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+            <thead className="bg-[#1E3A8A]/5 text-slate-700 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3 font-medium">Descrição</th>
-                <th className="px-6 py-3 font-medium">Categoria</th>
-                <th className="px-6 py-3 font-medium">Mês</th>
-                <th className="px-6 py-3 font-medium">Tipo</th>
-                <th className="px-6 py-3 font-medium">Status</th>
-                <th className="px-6 py-3 font-medium text-right">Valor</th>
-                <th className="px-6 py-3 font-medium text-right">Ações</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs">Descrição</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs">Categoria</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs text-center">Mês</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs text-center">Tipo</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs text-center">Status</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs text-right">Valor</th>
+                <th className="px-6 py-3.5 font-bold uppercase tracking-wider text-xs text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {enrichedParcels.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500 font-medium">
                     Nenhum lançamento encontrado para os filtros selecionados.
                   </td>
                 </tr>
               ) : (
                 enrichedParcels.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-slate-900">
+                    <td className="px-6 py-4 font-semibold text-slate-900">
                       {item.launch?.description}
                     </td>
                     <td className="px-6 py-4 text-center">
                       {item.category && (
-                        <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium text-white min-w-[120px] shadow-sm ${item.category.color}`}>
+                        <span className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-bold text-white min-w-[130px] shadow-sm uppercase tracking-wider bg-opacity-95 ${item.category.color}`}>
                           {item.category.name}
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-slate-600 font-medium">
-                        {getMonthName(item.month).substring(0, 3)}/{item.year}
-                      </span>
+                    <td className="px-6 py-4 text-center text-slate-600 font-bold uppercase text-[11px] tracking-wider">
+                      {getMonthName(item.month).substring(0, 3)}/{item.year}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={item.launch?.type === 'income' ? 'text-emerald-600 font-medium' : 'text-slate-600'}>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`font-bold uppercase text-[11px] tracking-wider ${item.launch?.type === 'income' ? 'text-emerald-600' : 'text-slate-600'}`}>
                         {item.launch?.type === 'income' ? 'Receita' : 'Despesa'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
+                    <td className="px-6 py-4 text-center">
+                      <div className="inline-flex items-center gap-1.5 justify-center bg-slate-50 border border-slate-200/60 rounded-full px-3 py-1 font-semibold text-slate-700">
                         {getStatusIcon(item.status)}
-                        <span className="capitalize font-medium">{translateStatus(item.status)}</span>
+                        <span className="capitalize font-bold text-xs">{translateStatus(item.status)}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right font-medium">
-                      <span className={item.status === 'cancelled' ? 'line-through text-slate-400' : ''}>
+                    <td className="px-6 py-4 text-right font-extrabold text-slate-900">
+                      <span className={item.status === 'cancelled' ? 'line-through text-slate-400 font-medium' : ''}>
                         {formatCurrency(item.amount)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => {
+                    <td className="px-6 py-4 text-right flex justify-end gap-1.5">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50" onClick={() => {
                         setDesc(item.launch!.description);
                         setAmount(item.amount.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."));
                         setType(item.launch!.type);
@@ -280,12 +333,12 @@ export function Launches() {
                         setNotes(item.notes || item.launch?.notes || '');
                         setEditingParcel({ parcel: item, launch: item.launch! });
                       }}>
-                        <Edit2 className="w-4 h-4 text-slate-500 hover:text-blue-600" />
+                        <Edit2 className="w-3.5 h-3.5 text-slate-500 hover:text-blue-600" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => {
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50" onClick={() => {
                         setDeleteConfirm(item);
                       }}>
-                        <Trash2 className="w-4 h-4 text-slate-500 hover:text-red-600" />
+                        <Trash2 className="w-3.5 h-3.5 text-slate-500 hover:text-red-600" />
                       </Button>
                     </td>
                   </tr>
@@ -293,6 +346,90 @@ export function Launches() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile View: Cards matching image mock up exactly */}
+        <div className="block md:hidden bg-slate-100 p-3 space-y-3">
+          {enrichedParcels.length === 0 ? (
+            <div className="p-8 text-center text-slate-500 font-bold bg-white rounded-2xl border border-slate-150">
+              Nenhum lançamento encontrado para os filtros selecionados.
+            </div>
+          ) : (
+            enrichedParcels.map((item) => (
+              <div key={item.id} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col gap-3">
+                {/* Linha 1: Descrição e Categoria */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-bold text-slate-800 text-sm leading-snug">
+                    {item.launch?.description}
+                  </div>
+                  {item.category && (
+                    <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-[10px] font-bold text-white shadow-sm shrink-0 uppercase tracking-wider bg-opacity-95 ${item.category.color}`}>
+                      {item.category.name}
+                    </span>
+                  )}
+                </div>
+
+                {/* Linha 2: Mês de Referência, Status e Valor (Status fica entre Categoria no topo e Valor) */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-500 font-bold text-[11px] uppercase tracking-wider">
+                    {getMonthName(item.month)} / {item.year}
+                  </span>
+                  
+                  <div className="flex items-center gap-2">
+                    {/* Status Badge */}
+                    <div className="flex items-center gap-1 bg-slate-50 border border-slate-200/60 rounded-full px-2 py-0.5 shrink-0">
+                      {getStatusIcon(item.status)}
+                      <span className="text-[10px] font-bold text-slate-700 capitalize">
+                        {translateStatus(item.status)}
+                      </span>
+                    </div>
+                    {/* Valor */}
+                    <span className={`font-extrabold text-[#111827] text-sm shrink-0 ${item.status === 'cancelled' ? 'line-through text-slate-400 font-medium' : ''}`}>
+                      {formatCurrency(item.amount)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Linha 3: Ações e Tipo ('DESPESAS' ou 'RECEITAS' no canto inferior direito ao lado das ações) */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100/80 mt-1">
+                  <div className="flex items-center gap-1.5">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 rounded-lg px-2.5 text-xs font-bold flex items-center gap-1 text-slate-600 hover:text-blue-600 border-slate-200 bg-white"
+                      onClick={() => {
+                        setDesc(item.launch!.description);
+                        setAmount(item.amount.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."));
+                        setType(item.launch!.type);
+                        setCategoryId(item.launch!.categoryId);
+                        setEditStatus(item.status);
+                        setNotes(item.notes || item.launch?.notes || '');
+                        setEditingParcel({ parcel: item, launch: item.launch! });
+                      }}
+                    >
+                      <Edit2 className="w-3 h-3 text-blue-500" />
+                      <span>Editar</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 rounded-lg px-2.5 text-xs font-bold flex items-center gap-1 text-slate-600 hover:text-red-600 border-slate-200 bg-white"
+                      onClick={() => {
+                        setDeleteConfirm(item);
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 text-red-500" />
+                      <span>Excluir</span>
+                    </Button>
+                  </div>
+
+                  <span className={`font-extrabold italic text-xs tracking-widest uppercase shrink-0 ${item.launch?.type === 'income' ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {item.launch?.type === 'income' ? 'RECEITA' : 'DESPESA'}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </Card>
 

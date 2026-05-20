@@ -69,7 +69,7 @@ export function Categories() {
 
   const renderCategoryGroup = (title: string, data: typeof categories) => (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold tracking-tight text-slate-800">{title}</h3>
+      <h3 className="text-lg font-bold tracking-tight text-slate-900">{title}</h3>
       <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-3 sm:gap-4">
         {data.map(cat => (
           <Card key={cat.id} className="hover:border-slate-300 transition-colors cursor-pointer group">
@@ -105,9 +105,9 @@ export function Categories() {
         </Button>
       </div>
 
-      {renderCategoryGroup('Categorias de Receita', incomes)}
+      {renderCategoryGroup('Receitas', incomes)}
       <div className="h-px bg-slate-200 my-4" />
-      {renderCategoryGroup('Categorias de Despesa', expenses)}
+      {renderCategoryGroup('Despesas', expenses)}
 
       {(isNew || editingCategory) && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
