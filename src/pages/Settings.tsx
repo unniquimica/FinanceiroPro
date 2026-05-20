@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Database, Download, Upload, AlertTriangle, CheckCircle2, Users, Key, Eye, EyeOff } from 'lucide-react';
+import { Database, Download, Upload, AlertTriangle, CheckCircle2, Users, Key, Eye, EyeOff, BookOpen } from 'lucide-react';
+import { SystemRulesModal } from '../components/SystemRulesModal';
 import { useFinance } from '../hooks/useFinance';
 import { useAuth } from '../context/AuthContext';
 import { defaultCategories } from '../data/mockData';
@@ -14,6 +15,7 @@ export function Settings() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -337,6 +339,29 @@ export function Settings() {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-slate-500" />
+            Regras do Sistema
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between p-4 border border-slate-200 rounded-lg bg-slate-50/50">
+            <div>
+              <h4 className="font-semibold text-slate-900">Manual e Funcionamento do Sistema</h4>
+              <p className="text-sm text-slate-500 max-w-xl">Leia sobre as regras essenciais do sistema: lançamentos não contábeis, funcionamento do lançamento rápido, agrupamento e campo de observações.</p>
+            </div>
+            <Button onClick={() => setIsRulesOpen(true)} className="gap-2 shrink-0 bg-slate-900 text-white hover:bg-slate-800">
+              <BookOpen className="w-4 h-4" />
+              Regras do Sistema
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <SystemRulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
       
     </div>
   );
