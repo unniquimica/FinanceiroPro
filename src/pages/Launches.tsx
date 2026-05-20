@@ -120,11 +120,10 @@ export function Launches() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <div className="sticky top-16 md:top-16 z-20 bg-slate-50 -mt-4 md:-mt-4 md:pt-0 pb-2 border-b border-transparent">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-6">
-          <h2 className="text-2xl font-bold tracking-tight md:hidden">Lançamentos</h2>
-          <div className="hidden md:block" /> {/* Spacer for desktop */}
-          <Button className="gap-2" onClick={() => {
+      <div className="md:sticky md:top-16 z-20 bg-slate-50 pt-1 md:pt-0 pb-2">
+        <div className="flex flex-row justify-between md:justify-end items-center gap-3 mb-3 md:mb-5">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:hidden">Lançamentos</h2>
+          <Button className="gap-1.5 py-2 px-3 text-xs sm:text-sm font-semibold h-10 shadow-sm shrink-0" onClick={() => {
             setDesc('');
             setAmount('');
             setInstallments('1');
@@ -182,7 +181,7 @@ export function Launches() {
           </div>
 
           {/* Mobile Filter Header */}
-          <div className="flex md:hidden flex-col p-4 border-b border-slate-100 gap-3 bg-white rounded-t-xl">
+          <div className="flex md:hidden flex-col p-3 border-b border-slate-100 gap-2.5 bg-white rounded-t-xl">
             {/* Linha 1: Busca */}
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -191,7 +190,7 @@ export function Launches() {
                 placeholder="Buscar lançamento..." 
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 bg-slate-50 font-semibold text-slate-800"
+                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 bg-slate-50 font-semibold text-slate-800"
               />
             </div>
             {/* Linha 2: MÊS, ANO e FUNIL */}
@@ -219,7 +218,7 @@ export function Launches() {
 
               <Button 
                 variant={showFilters ? "default" : "outline"} 
-                className="shrink-0 h-9 w-9 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center text-xs font-bold p-0" 
+                className="shrink-0 h-9.5 w-9.5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center text-xs font-bold p-0" 
                 onClick={() => {
                   if (showFilters) {
                     setFilterType('all');
@@ -269,7 +268,7 @@ export function Launches() {
         </Card>
       </div>
 
-      <Card className="border-slate-200 overflow-hidden shadow-md">
+      <Card className="border-transparent md:border-slate-200 overflow-hidden shadow-none md:shadow-md bg-transparent md:bg-white">
         {/* Desktop view: Table */}
         <div className="hidden md:block overflow-x-auto scrollbar-hide">
           <table className="w-full text-sm text-left min-w-[800px]">
@@ -349,7 +348,7 @@ export function Launches() {
         </div>
 
         {/* Mobile View: Cards matching image mock up exactly */}
-        <div className="block md:hidden bg-slate-100 p-3 space-y-3">
+        <div className="block md:hidden bg-transparent p-0 space-y-3">
           {enrichedParcels.length === 0 ? (
             <div className="p-8 text-center text-slate-500 font-bold bg-white rounded-2xl border border-slate-150">
               Nenhum lançamento encontrado para os filtros selecionados.
